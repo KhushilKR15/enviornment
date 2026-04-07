@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veritas EnviroLabs | Comprehensive Environmental Intelligence</title>
+    <style>
+    .article-view .article-view {
+    display: none; 
+    background: var(--white);
+    min-height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: 5;
+    animation: fadeIn 0.4s ease-out;
+}
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            --primary: #1b5e20;       /* Deep Forest Green */
+            --primary-light: #4caf50;
+            --secondary: #01579b;     /* Deep Ocean Blue */
+            --accent: #ffab00;        /* Amber Warning */
+            --bg-body: #f4f6f8;
+            --bg-sidebar: #1a202c;
+            --text-main: #2d3748;
+            --text-light: #a0aec0;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+            border-right: 1px solid #2d3748;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-bottom: 1px solid #4a5568;
+        }
+        
+        .sidebar-header span { color: var(--primary-light); }
+
+        .nav-links { list-style: none; padding: 0; margin: 0; }
+        
+        .nav-item button {
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item button:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--white);
+            padding-left: 25px;
+        }
+
+        .nav-item button.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-left: 4px solid var(--accent);
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* --- DASHBOARD GRID --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .topic-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border-top: 4px solid transparent;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .topic-card.air { border-color: #4caf50; }
+        .topic-card.water { border-color: #039be5; }
+        .topic-card.soil { border-color: #795548; }
+        .topic-card.tech { border-color: #607d8b; }
+
+        .topic-card h3 { margin-top: 0; font-size: 1.2rem; color: #2d3748; }
+        .topic-card p { font-size: 0.9rem; color: #718096; line-height: 1.5; }
+
+        /* --- FULL PAGE ARTICLE STYLES --- */
+        .article-view {
+            display: none; /* Hidden by default */
+            background: var(--white);
+            min-height: 100%;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .article-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 60px 40px;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+
+        .article-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .article-content h2 { color: var(--primary); margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .article-content p { margin-bottom: 20px; }
+        .article-content ul { background: #f7fafc; padding: 20px 40px; border-radius: 8px; border-left: 4px solid var(--secondary); }
+        
+        /* Reading Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: none; /* Only show on articles */
+        }
+        .progress-bar {
+            height: 4px;
+            background: var(--accent);
+            width: 0%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
+        .active-view { display: block !important; }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">Veritas <span>EnviroLabs</span></div>
+        <ul class="nav-links">
+            <li class="nav-item"><button onclick="loadView('dashboard')" class="active">Dashboard Overview</button></li>
+            <li class="nav-item"><button onclick="loadView('page-air')">Air Quality Standards</button></li>
+            <li class="nav-item"><button onclick="loadView('page-water')">Water Purification</button></li>
+            <li class="nav-item"><button onclick="loadView('page-soil')">Soil & Agriculture</button></li>
+            <li class="nav-item"><button onclick="loadView('page-noise')">Noise Pollution</button></li>
+            <li class="nav-item"><button onclick="loadView('page-ind')">Industrial Compliance</button></li>
+            <li class="nav-item"><button onclick="loadView('page-res')">Residential Safety</button></li>
+            <li class="nav-item"><button onclick="loadView('page-food')">Food Safety Lab</button></li>
+            <li class="nav-item"><button onclick="loadView('page-rad')">Radiation Testing</button></li>
+            <li class="nav-item"><button onclick="loadView('page-clim')">Climate Change</button></li>
+            <li class="nav-item"><button onclick="loadView('page-smart')">Smart City IoT</button></li>
+            <li class="nav-item"><button onclick="loadView('page-waste')">Waste Management</button></li>
+            <li class="nav-item"><button onclick="loadView('page-mar')">Marine Biology</button></li>
+            <li class="nav-item"><button onclick="loadView('page-tox')">Toxicology Reports</button></li>
+            <li class="nav-item"><button onclick="loadView('page-legal')">Environmental Law</button></li>
+            <li class="nav-item"><button onclick="loadView('page-csr')">CSR & Sustainability</button></li>
+            <li class="nav-item"><button onclick="loadView('page-rem')">Home Remedies</button></li>
+            <li class="nav-item"><button onclick="loadView('page-equip')">Lab Equipment</button></li>
+            <li class="nav-item"><button onclick="loadView('page-cit')">Citizen Reporting</button></li>
+            <li class="nav-item"><button onclick="loadView('page-cont')">Sources, Standards used here</button></li>
+        </ul>
+    </nav>
+
+    <div class="progress-container" id="progressBarContainer">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+
+    <div class="main-content" id="mainScroll">
+        
+        <div id="dashboard" class="container active-view">
+            <h1 style="color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 15px;">Environmental Intelligence Dashboard</h1>
+            
+            <div style="background: #e8f5e9; border-left: 5px solid var(--primary); padding: 20px; margin-bottom: 25px; border-radius: 0 8px 8px 0;">
+                <p style="margin: 0; font-size: 1.05rem; line-height: 1.6;">
+                    <strong>Welcome to Veritas EnviroLabs.</strong> We are your premier partner in comprehensive environmental intelligence. By bridging the gap between rigorous scientific analysis and actionable sustainability, we empower communities, industries, and individuals to make informed decisions. From molecular toxicology to smart city integrations, our data-driven approach helps protect both public health and planetary integrity.
+                </p>
+            </div>
+
+            <p style="font-weight: 500; margin-bottom: 25px;">Select a module below to access detailed scientific reports, interactive analysis, and legal standards.</p>
+            
+            <div class="dashboard-grid">
+    
+    <div class="topic-card air" onclick="loadView('page-air')">
+        <h3>Air Quality</h3>
+        <p>PM2.5, VOCs, and urban smog analytics.</p>
+    </div>
+
+    <div class="topic-card water" onclick="loadView('page-water')">
+        <h3>Water Purification</h3>
+        <p>RO, UV, and removal of heavy metals.</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-soil')">
+        <h3>Soil Health</h3>
+        <p>NPK profiling and crop optimization.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-noise')">
+        <h3>Noise & Vibration</h3>
+        <p>Decibel mapping for industrial zones.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-ind')">
+        <h3>Industrial Audit</h3>
+        <p>Stack monitoring and ETP efficiency.</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-res')">
+        <h3>Residential Safety</h3>
+        <p>Indoor air and toxin checks for homes.</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-food')">
+        <h3>Food Safety Lab</h3>
+        <p>Pesticide residues and adulteration tests.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-rad')">
+        <h3>Radiation Check</h3>
+        <p>Radon gas and EMF detection.</p>
+    </div>
+
+    <div class="topic-card air" onclick="loadView('page-clim')">
+        <h3>Climate Change</h3>
+        <p>Carbon footprinting and risk modeling.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-smart')">
+        <h3>Smart City IoT</h3>
+        <p>Real-time sensor networks (IoT).</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-waste')">
+        <h3>Waste Mgmt</h3>
+        <p>Landfills, recycling, and circular economy.</p>
+    </div>
+
+    <div class="topic-card water" onclick="loadView('page-mar')">
+        <h3>Marine Biology</h3>
+        <p>Ocean acidity and microplastics.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-tox')">
+        <h3>Toxicology</h3>
+        <p>Bioassays and health risk assessments.</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-legal')">
+        <h3>Enviro Law</h3>
+        <p>Legal compliance and treaties.</p>
+    </div>
+
+    <div class="topic-card air" onclick="loadView('page-csr')">
+        <h3>CSR & ESG</h3>
+        <p>Corporate sustainability reporting.</p>
+    </div>
+
+    <div class="topic-card soil" onclick="loadView('page-rem')">
+        <h3>Home Remedies</h3>
+        <p>DIY purification for air and water.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-equip')">
+        <h3>Lab Equipment</h3>
+        <p>Our advanced machinery (GC-MS, HPLC).</p>
+    </div>
+
+    <div class="topic-card air" style="border-color: #d32f2f;" onclick="loadView('page-cit')">
+        <h3 style="color: #d32f2f;">Citizen Report</h3>
+        <p>Report pollution incidents anonymously.</p>
+    </div>
+
+    <div class="topic-card tech" onclick="loadView('page-cont')">
+        <h3>Sources, Standards used here</h3>
+        <p>Get sources links and it details.</p>
+    </div>
+
+</div>
+        </div>
+
+        <div id="page-air" class="article-view">
+            <div class="article-header">
+                <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+                <h1>Comprehensive Air Quality Analysis</h1>
+                <p>Understanding the invisible threats: Particulates, Gases, and Health.</p>
+            </div>
+            <div class="article-content">
+                <p><strong>Introduction to Atmospheric Science</strong><br>
+                The air we breathe is a complex mixture of gases and particles. While Nitrogen (78%) and Oxygen (21%) make up the bulk, it is the remaining 1% of trace gases and particulate matter that defines air quality.</p>
+
+                <h2>1. Particulate Matter: The Silent Killer</h2>
+                <p>Particulate Matter (PM) is categorized by size, not chemical makeup.</p>
+                <ul>
+                    <li><strong>PM 10 (Coarse Particles):</strong> Smaller than 10 micrometers (e.g., road dust).</li>
+                    <li><strong>PM 2.5 (Fine Particles):</strong> Smaller than 2.5 micrometers. These travel deep into the lungs and enter the bloodstream.</li>
+                </ul>
+
+                <h2>2. Hazardous Gases & Volatile Organic Compounds (VOCs)</h2>
+                <p><strong>Nitrogen Dioxide (NO2):</strong> Emitted by diesel engines. A precursor to acid rain.</p>
+                <p><strong>Ground-Level Ozone (O3):</strong> Created by chemical reactions between NOx and VOCs in sunlight.</p>
+
+                <h2>3. The Veritas Testing Protocol</h2>
+                <ol>
+                    <li><strong>Laser Nephelometry:</strong> Real-time detection of PM2.5 spikes.</li>
+                    <li><strong>Gravimetric Analysis:</strong> Filter-based mass measurement for government compliance.</li>
+                    <li><strong>Chemical Speciation:</strong> Dissolving dust to check for heavy metals like Lead (Pb).</li>
+                </ol>
+                <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="air quality.jpeg"
+                                alt="1" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+            </div>
+        </div>
+
+<div id="page-water" class="article-view">
+    <div class="article-header">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Advanced Water Purification Technologies</h1>
+        <p>Ensuring potability through chemistry, filtration, and physics.</p>
+    </div>
+    <div class="article-content">
+        <p><strong>The Essence of Life:</strong> Water is the universal solvent, making it easily contaminated. We analyze surface water, groundwater, and municipal supplies to ensure safety.</p>
+
+        <h2>1. Common Contaminants</h2>
+        <ul>
+            <li><strong>Biological Pathogens:</strong> E. Coli, Salmonella.</li>
+            <li><strong>Dissolved Solids (TDS):</strong> High TDS can cause kidney stones.</li>
+            <li><strong>Heavy Metals:</strong> Lead, Arsenic, Mercury.</li>
+        </ul>
+
+        <h2>2. Purification Technologies</h2>
+        
+        <h3>A. Reverse Osmosis (RO)</h3>
+        <p>Reverse Osmosis forces water through a semi-permeable membrane and is best for high-TDS water. Commonly called RO, it is one of the oldest techniques used in the purification of seawater. It refers to the movement of solvent from a region of high concentration of solute to a region of low concentration of solute or pure solvent through a semipermeable membrane.</p>
+        
+        <p><strong>What is Reverse Osmosis?</strong> When a hydrostatic pressure (greater than the osmotic pressure) is applied on the higher concentration side, solvent molecules start moving from the higher concentration side to the lower concentration side through the semipermeable membrane (SPM). This process is called Reverse osmosis.</p>
+        <h3>B. Ultraviolet (UV) Disinfection</h3>
+        <p>UV rays or light is a type of electromagnetic radiation that belongs to the electromagnetic spectrum. The wavelength of UV light is shorter than the wavelength of visible light, so the UV light is not visible to human beings with the naked eye. The property of UV rays is their ability to cause chemical reactions. They are used in various applications, such as disinfecting water by damaging pathogen DNA and curing certain materials. While effective for low-TDS water with biological risks, UV rays can be harmful, potentially resulting in skin aging and an increased risk of skin cancer.</p>
+
+        <h2>3. Household Testing Steps</h2>
+        <ol>
+            <li><strong>Smell Test:</strong> Rotten egg smell = Hydrogen Sulfide.</li>
+            <li><strong>Turbidity:</strong> Cloudy water that doesn't clear is sediment.</li>
+        </ol>
+        
+        <p>To purify water at home, boiling, chlorination, and using water filters are effective methods. Boiling kills germs, adding chlorine disinfects, and filters remove contaminants, ensuring safe drinking water (Source: Centers for Disease Control and Prevention, hopeforce.org).</p>
+
+        <h3>Water Purification Methods Summary</h3>
+        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #f2f2f2; text-align: left;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Method</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Effectiveness</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Key Steps</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Boiling</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Kills germs</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Boil for 1-3 minutes, cool, store properly.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Chlorination</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Disinfects water</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Add bleach (8 drops/gallon for clear water), wait 30 minutes.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Water Filters</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Removes contaminants</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Choose appropriate filter type (Straw, Pump, Gravity) for needs.</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="water.jpeg"
+                                alt="2" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+<div id="page-soil" class="article-view">
+            <div class="article-header" style="background: linear-gradient(135deg, #5d4037 0%, #8d6e63 100%);">
+                <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+                <h1>Soil Health & Agricultural Optimization</h1>
+                <p>Unlocking the chemical secrets beneath our feet.</p>
+            </div>
+            <div class="article-content">
+                <h2>1. The N-P-K Trinity</h2>
+                <p>Plants require three primary macronutrients:</p>
+                <ul>
+                    <li><strong>Nitrogen (N):</strong> Essential for vegetative growth and lush leaf development.</li>
+                    <li><strong>Phosphorus (P):</strong> Critical for root development, flowering, and energy transfer.</li>
+                    <li><strong>Potassium (K):</strong> Enhances disease resistance and regulates water movement within the plant.</li>
+                </ul>
+
+                <h2>2. The Critical Role of pH</h2>
+                <p>Soil pH acts as a nutrient gatekeeper; acidic soil often locks out Phosphorus, while alkaline soil can lock out essential micronutrients. Maintaining soil health is the bedrock of sustainable agriculture. While many factors contribute to a thriving ecosystem, Soil pH is often considered the "master variable" because it controls the chemical environment of the roots.</p>
+
+                <h3>The Role of pH in Soil Health</h3>
+                <ul>
+                    <li><strong>Nutrient Availability:</strong> pH determines whether essential minerals are soluble. In highly acidic soils, vital nutrients like phosphorus become "locked" and unavailable to plants.</li>
+                    <li><strong>Microbial Activity:</strong> Beneficial bacteria that decompose organic matter thrive in near-neutral pH (6.0 to 7.0).</li>
+                    <li><strong>Toxicity Prevention:</strong> At low pH (below 5.5), aluminum and manganese can become soluble at toxic levels, stunting root growth.</li>
+                    <li><strong>Fertilizer Efficiency:</strong> If pH is off, applying fertilizer is often a waste of money, as the plant cannot physically absorb the nutrients provided.</li>
+                    <li><strong>Cation Exchange Capacity (CEC):</strong> pH levels influence the soil's ability to hold onto positively charged nutrients like calcium and magnesium.</li>
+                </ul>
+
+                
+
+                <h3>Key Points on Soil Health & Optimization</h3>
+                <ul>
+                    <li><strong>Soil Structure:</strong> Healthy soil has good "tilth," meaning it is porous enough for air and water movement.</li>
+                    <li><strong>Organic Matter:</strong> This is the "soul" of the soil, improving water retention and feeding the microbiome.</li>
+                    <li><strong>The Ideal Range:</strong> Most crops prefer a pH between 6.0 and 7.5.</li>
+                    <li><strong>Liming:</strong> Adding agricultural lime is the standard method to raise the pH of acidic soils.</li>
+                    <li><strong>Sulfur Application:</strong> Elemental sulfur or aluminum sulfate is used to lower the pH of alkaline soils.</li>
+                    <li><strong>Microbiome Diversity:</strong> A healthy soil contains billions of fungi, bacteria, and protozoa per teaspoon.</li>
+                    <li><strong>Water Infiltration:</strong> Optimized soil prevents runoff and erosion by absorbing rainfall effectively.</li>
+                    <li><strong>Carbon Sequestration:</strong> Healthy soils act as a "sink," pulling CO<sub>2</sub> from the atmosphere into the ground.</li>
+                    <li><strong>Crop Rotation:</strong> Changing crops annually breaks pest cycles and prevents specific nutrient depletion.</li>
+                    <li><strong>Cover Cropping:</strong> Planting "green manure" protects the soil surface and adds nitrogen.</li>
+                    <li><strong>No-Till Farming:</strong> Reducing mechanical disturbance preserves the delicate fungal networks (mycorrhizae).</li>
+                    <li><strong>Nitrogen Fixation:</strong> Legumes work with Rhizobium bacteria to turn atmospheric nitrogen into plant food.</li>
+                    <li><strong>Salinity Management:</strong> Excess salts can dehydrate plants; proper drainage and pH balance help mitigate this.</li>
+                    <li><strong>Compaction Issues:</strong> Heavy machinery squeezes out air pockets, suffocating roots and microbes.</li>
+                    <li><strong>Precision Agriculture:</strong> Using GPS and sensors to apply lime and fertilizer only where needed.</li>
+                    <li><strong>Soil Testing:</strong> Regular lab analysis is the only way to accurately manage pH and nutrient levels.</li>
+                    <li><strong>Cation Balance:</strong> Balancing the ratio of Calcium, Magnesium, and Potassium is vital for plant cell strength.</li>
+                    <li><strong>Erosion Control:</strong> Roots and organic mulch act as an anchor against wind and water.</li>
+                    <li><strong>Earthworm Populations:</strong> Their presence is a primary indicator of high-quality, aerated soil.</li>
+                    <li><strong>Root Exudates:</strong> Plants "leak" sugars into the soil to feed beneficial microbes in the rhizosphere.</li>
+                    <li><strong>Nutrient Cycling:</strong> The continuous movement of nutrients from organic form to mineral form.</li>
+                    <li><strong>Buffering Capacity:</strong> The soil's ability to resist changes in pH, largely dictated by clay and organic content.</li>
+                    <li><strong>Biochar:</strong> Adding charred biomass can improve long-term carbon storage and pH stability.</li>
+                    <li><strong>Integrated Pest Management (IPM):</strong> Healthy plants in optimized soil are naturally more resistant to insects.</li>
+                    <li><strong>Mycorrhizal Fungi:</strong> These extend the root system's reach, specifically helping with phosphorus uptake.</li>
+                    <li><strong>Humus Formation:</strong> The stable, long-lasting part of organic matter that gives soil its dark color.</li>
+                    <li><strong>Leaching Prevention:</strong> Proper pH and organic levels keep nitrates from washing into groundwater.</li>
+                    <li><strong>Trace Elements:</strong> pH controls the "micro" nutrients like Zinc, Iron, and Boron.</li>
+                    <li><strong>Resilience to Drought:</strong> High organic matter allows soil to hold more water for longer periods.</li>
+                    <li><strong>Sustainable Yields:</strong> Optimization ensures the land remains productive for future generations.</li>
+                </ul>
+
+                <h2>3. Soil Texture</h2>
+                <p>We analyze the percentage of Sand, Silt, and Clay to determine irrigation strategies and water retention capabilities.</p>
+                <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="soil.jpeg"
+                                alt="3" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+                
+
+            </div>
+        </div>
+        
+<div id="page-noise" class="article-view">
+            <div class="article-header" style="background: linear-gradient(135deg, #37474f 0%, #546e7a 100%);">
+                <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+                <h1>Noise & Vibration Analytics</h1>
+                <p>Quantifying the acoustic environment for health and structural integrity.</p>
+            </div>
+            <div class="article-content">
+                <p>Noise pollution is the second largest environmental cause of health problems, following air quality. It is defined as unwanted or harmful outdoor sound created by human activities, including transport, road traffic, rail traffic, air traffic, and industrial activity.</p>
+                
+                <h2>1. Physics of Sound & Vibration</h2>
+                <p>Understanding sound requires looking at it as a mechanical wave that travels through mediums (air, water, solids).</p>
+                <ul>
+                    <li><strong>Frequency (Hz):</strong> Determines the pitch. Low-frequency sounds (20Hz – 250Hz) have long wavelengths that penetrate heavy walls and soil easily, making them harder to block than high-frequency sounds.</li>
+                    <li><strong>Amplitude (dB):</strong> Measures loudness on a logarithmic scale. A 10dB increase represents a tenfold increase in sound intensity and a perceived doubling of loudness.</li>
+                    <li><strong>Resonance:</strong> Occurs when a vibration matches the natural frequency of an object, potentially leading to structural damage or amplified noise levels.</li>
+                </ul>
+
+                
+
+                <h2>2. The Decibel Scale & Safety Thresholds</h2>
+                <p>Because the decibel (dB) scale is logarithmic, small numerical changes represent significant physical differences. The human ear's sensitivity is typically measured using "A-weighting" (dBA).</p>
+                <table style="width:100%; border-collapse: collapse; margin: 15px 0;">
+                    <thead>
+                        <tr style="background-color: #eceff1; text-align: left;">
+                            <th style="padding: 10px; border: 1px solid #cfd8dc;">Sound Level</th>
+                            <th style="padding: 10px; border: 1px solid #cfd8dc;">Example Source</th>
+                            <th style="padding: 10px; border: 1px solid #cfd8dc;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">30 dB</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Whisper / Quiet Library</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Ideal for sleep and concentration.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">60 dB</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Normal Conversation</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Comfortable for daytime activity.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">85 dB</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Heavy Traffic / Power Tools</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Threshold for potential hearing damage (8+ hours).</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">120 dB</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Jet Takeoff / Siren</td>
+                            <td style="padding: 10px; border: 1px solid #cfd8dc;">Threshold of pain; immediate risk of damage.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>3. Health & Psychological Impacts</h2>
+                <p>Chronic exposure to noise above 65dB acts as a physiological stressor. It triggers the release of stress hormones like cortisol and adrenaline, even when the person is asleep.</p>
+                <ul>
+                    <li><strong>Cardiovascular Health:</strong> Sustained noise leads to hypertension, increased heart rate, and elevated risk of ischemic heart disease.</li>
+                    <li><strong>Sleep Disturbance:</strong> Fragmented sleep prevents the body from entering deep REM cycles, leading to cognitive decline and irritability.</li>
+                    <li><strong>Tinnitus:</strong> Persistent ringing in the ears caused by damage to the fine hair cells (cilia) within the cochlea.</li>
+                </ul>
+
+<h2>4. Mitigation & Control Strategies</h2>
+        <p>Effective noise management follows a structured "Hierarchy of Control" that prioritizes fixing the problem at the origin rather than just protecting the listener. This approach ensures long-term environmental health rather than temporary relief.</p>
+        
+        <ul>
+            <li>
+                <strong>Source Control (Most Effective):</strong> This involves engineering the noise out of the environment. Examples include regular maintenance of industrial machinery to prevent friction-based squealing, using "quiet" rubber compounds for vehicle tires, and installing vibration isolators or rubber mounts to decouple heavy motors from the building's structure.
+            </li>
+            <li>
+                <strong>Path Mitigation:</strong> If the source cannot be silenced, the sound path must be interrupted. This is achieved by installing acoustic barriers (noise walls), using high-density sound-absorbing insulation like rockwool, and utilizing double-glazed or laminated windows to break the transmission of sound waves before they enter a living space.
+            </li>
+            <li>
+                <strong>Receiver Protection (Last Resort):</strong> When engineering and path controls are insufficient, the individual must be protected. This includes personal protective equipment (PPE) like silicone earplugs or advanced Active Noise-Canceling (ANC) technology, which generates "anti-noise" waves to phase out incoming sound.
+            </li>
+        </ul>
+
+        
+
+        <h2>5. Vibration Analytics</h2>
+        <p>Vibration is technically "structure-borne" noise—energy that travels through solids (soil, steel, concrete) rather than air. Analytics in this field focus on <strong>Peak Particle Velocity (PPV)</strong>, which measures the maximum speed of a soil or structural particle as it vibrates.</p>
+        
+        <p>Monitoring PPV is critical in construction and mining to ensure that heavy blasting or pile-driving does not reach frequencies that cause resonance in nearby residential foundations, which can lead to hairline fractures. Additionally, vibration analytics are used to protect "sensitive receivers" like laboratory electron microscopes, which can be rendered useless by even microscopic floor tremors.</p>
+
+        <div style="width: 100%; text-align: center; margin-top: 20px;">
+                 alt="NOISE_POLLUTION" 
+                 style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+        </div>
+                <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="noise.jpeg" 
+                                alt="4" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+                    </div> </div> 
+                    <div id="page-ind" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #263238 0%, #37474f 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Industrial Environmental Compliance</h1>
+        <p>Navigating the intersection of industrial productivity and environmental law.</p>
+    </div>
+    <div class="article-content">
+        <h2>Overview of Industrial Environmental Compliance</h2>
+        <p>Industrial environmental compliance is the mandatory adherence to laws, regulations, and standards designed to minimize the ecological footprint of business operations. It ensures that industries operate responsibly, reducing pollution and conserving natural resources to protect both the ecosystem and public health.</p>
+
+        <h3>Key Aspects of Compliance</h3>
+        <ul>
+            <li><strong>Regulatory Framework:</strong> Guidance provided by overlapping federal, state, and local environmental authorities.</li>
+            <li><strong>Environmental Impact:</strong> Focused strategies for reducing carbon footprints, chemical runoff, and resource depletion.</li>
+            <li><strong>Public Health:</strong> The primary goal of ensuring that air and water remains safe for human consumption and activity.</li>
+        </ul>
+
+        <h2>Major Regulatory Acts</h2>
+        <p>Modern compliance is built upon several foundational pieces of legislation that govern how industries interact with the environment:</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+                <tr style="background-color: #f8f9fa; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #ddd;">Regulation</th>
+                    <th style="padding: 12px; border: 1px solid #ddd;">Primary Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>Clean Air Act (CAA)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Regulates air emissions from stationary and mobile sources.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>Clean Water Act (CWA)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Governs the discharge of pollutants into navigable waters.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>RCRA</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Manages the "cradle-to-grave" disposal of hazardous waste.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>CERCLA (Superfund)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Addresses the cleanup and liability for hazardous substance releases.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Core Compliance Areas</h2>
+        <p>Industries must monitor and report data across four primary environmental pillars:</p>
+        <ol>
+            <li><strong>Air Quality:</strong> Installing scrubbers and sensors to monitor and control industrial emissions.</li>
+            <li><strong>Water Quality:</strong> Implementing on-site wastewater treatment plants to ensure discharge meets safe standards.</li>
+            <li><strong>Waste Management:</strong> Rigorous protocols for the identification, storage, and recycling of industrial byproducts.</li>
+            <li><strong>Resource Conservation:</strong> Auditing energy and material use to optimize efficiency and reduce waste.</li>
+        </ol>
+
+
+        <h2>Business Benefits & Strategies</h2>
+        <p>While compliance is a legal obligation, it also offers significant competitive advantages. Companies that act ethically toward the environment often see increased market demand and long-term cost savings through efficient resource use.</p>
+        
+        <ul>
+            <li><strong>Risk Mitigation:</strong> Proactive audits prevent environmental incidents that could lead to massive fines.</li>
+            <li><strong>Reputation Enhancement:</strong> Builds stakeholder trust by proving commitment to corporate social responsibility (CSR).</li>
+            <li><strong>Compliance Strategies:</strong> Successful firms utilize regular third-party audits, comprehensive employee training, and specialized environmental consultation services.</li>
+        </ul>
+
+        <h2>The Challenges of Implementation</h2>
+        <p>Navigating the intricate web of evolving environmental laws remains a significant hurdle. High initial investment costs and the constant change in global standards require dedicated environmental management systems (EMS) to maintain operational continuity.</p>
+        
+        <p><strong>Conclusion:</strong> Industrial compliance is not just about avoiding penalties; it is a critical component of sustainable business practices that ensure the longevity of both the company and the planet.</p>
+    <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="industrial compliance.jpeg"
+                                alt="5" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-res" class="article-view">
+            <div class="article-header" style="background: linear-gradient(135deg, #fbc02d 0%, #f57f17 100%);">
+                <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+                <h1>Residential Habitation Safety</h1>
+                <p>Ensuring healthy indoor environments through air, water, and material analytics.</p>
+            </div>
+            <div class="article-content">
+                <h2>1. Sick Building Syndrome (SBS) & Indoor Air Quality</h2>
+                <p>Sick Building Syndrome (SBS) describes a situation where occupants experience acute health effects that appear to be linked to time spent in a building, but no specific illness or cause can be identified. These symptoms typically disappear after leaving the premises.</p>
+                
+                <h3>Common Indoor Pollutants</h3>
+                <ul>
+                    <li><strong>Volatile Organic Compounds (VOCs):</strong> Emitted as gases from certain solids or liquids, including Formaldehyde from new furniture, carpets, and pressed-wood products.</li>
+                    <li><strong>Biological Contaminants:</strong> Mold spores, pollen, and bacteria thrive in humid environments or poorly maintained HVAC systems, leading to respiratory distress.</li>
+                    <li><strong>Carbon Dioxide (CO2) Buildup:</strong> High concentrations of CO2 in poorly ventilated spaces cause "stuffy air," leading to headaches, fatigue, and reduced cognitive function.</li>
+                </ul>
+
+                
+
+                <h2>2. Habitability Certificate: The Scoring System</h2>
+                <p>A Habitability Certificate is a formal document verifying that a residential unit meets specific environmental health standards. We use a 100-point weighted scale to determine the safety of the living space:</p>
+
+                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 20px; margin: 20px 0;">
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 15px;">
+                            <strong>Air Quality (30 pts):</strong> Measurement of Particulate Matter (PM2.5 and PM10), VOC levels, and the Air Exchange Rate (ACH) to ensure sufficient ventilation.
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <strong>Water Quality (30 pts):</strong> A comprehensive purity check for bacterial pathogens (Coliform), dissolved solids (TDS), and residual chlorine levels.
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <strong>Toxicology & Materials (20 pts):</strong> Inspection for legacy hazards such as Lead-based paint, friable Asbestos in insulation, and Radon gas seepage from the foundation.
+                        </li>
+                        <li>
+                            <strong>Acoustics & Lighting (20 pts):</strong> Assessment of ambient noise levels (decibels) and access to natural light/UV, which are critical for circadian health.
+                        </li>
+                    </ul>
+                </div>
+
+                <h2>3. Key Safety Thresholds</h2>
+                <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                    <thead>
+                        <tr style="background-color: #fef9e7; text-align: left;">
+                            <th style="padding: 12px; border: 1px solid #ddd;">Parameter</th>
+                            <th style="padding: 12px; border: 1px solid #ddd;">Safety Limit</th>
+                            <th style="padding: 12px; border: 1px solid #ddd;">Health Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #ddd;"><strong>CO2 Levels</strong></td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">&lt; 1000 ppm</td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">Prevents drowsiness and headaches.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #ddd;"><strong>Humidity</strong></td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">30% – 50%</td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">Suppresses mold growth and dust mites.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #ddd;"><strong>PM2.5</strong></td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">&lt; 12 µg/m³</td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">Reduces long-term cardiovascular risk.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>4. Preventive Measures for Residents</h2>
+                <p>Maintaining a safe habitation zone requires consistent monitoring and simple behavioral changes:</p>
+                <ol>
+                    <li><strong>Source Removal:</strong> Avoid smoking indoors and opt for "Low-VOC" paints and sealants during renovations.</li>
+                    <li><strong>Enhanced Ventilation:</strong> Use HEPA-filtered air purifiers and ensure exhaust fans in kitchens and bathrooms are vented to the outside to prevent moisture buildup.</li>
+                    <li><strong>Biophilic Cleansing:</strong> While not a total solution, certain indoor plants like the Snake Plant or Peace Lily can help supplement air filtration of minor toxins.</li>
+                </ol>
+
+                <p style="margin-top: 20px; font-style: italic; color: #555;"><strong>Note:</strong> Habitability audits should be performed annually or after any significant structural renovation to ensure ongoing safety compliance.</p>
+                <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="residental safety.jpeg"
+                                alt="6" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+            </div>
+        </div>
+
+<div id="page-food" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Food Safety & Molecular Toxicology</h1>
+        <p>Advanced screening for chemical purity and biological integrity in nutrition.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Global Food Challenge:</strong> In an increasingly industrialised food system, the journey from farm to fork is fraught with potential contamination. Our lab specializes in identifying invisible chemical threats that pose long-term risks to human health.</p>
+
+        <h2>1. Pesticide Residue Analysis</h2>
+        <p>Modern agriculture relies on synthetic chemicals. We use <strong>LC-MS/MS (Liquid Chromatography-Mass Spectrometry)</strong> to detect residues even at parts per billion (ppb) levels.</p>
+        <ul>
+            <li><strong>Glyphosate:</strong> The world's most common herbicide, linked to soil degradation and potential health risks.</li>
+            <li><strong>Organophosphates:</strong> Potent neurotoxins used in fruit and vegetable farming.</li>
+            <li><strong>Neonicotinoids:</strong> Pesticides that impact bee populations and enter the human food chain through honey and produce.</li>
+        </ul>
+
+        
+
+        <h2>2. Adulteration & Chemical Fraud</h2>
+        <p>Food fraud is a billion-dollar issue. We perform molecular "fingerprinting" to ensure what you see on the label is what is in the package.</p>
+        <table style="width:100%; border-collapse: collapse; margin: 15px 0; background: #fff5f5;">
+            <thead>
+                <tr style="background-color: #ef9a9a; text-align: left;">
+                    <th style="padding: 10px; border: 1px solid #e57373;">Food Item</th>
+                    <th style="padding: 10px; border: 1px solid #e57373;">Common Adulterant</th>
+                    <th style="padding: 10px; border: 1px solid #e57373;">Detection Method</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Milk</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Urea, Detergents, Starch</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Chemical Strip Testing</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Honey</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">High Fructose Corn Syrup</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Isotope Ratio Mass Spectrometry</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Spices</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">Lead Chromate, Sudun Dyes</td>
+                    <td style="padding: 10px; border: 1px solid #ffcdd2;">X-Ray Fluorescence (XRF)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Bioaccumulation & Heavy Metals</h2>
+        <p>Heavy metals do not break down; they move up the food chain, becoming more concentrated in a process called <strong>Biomagnification</strong>.</p>
+
+        <ul style="background: #fafafa; border-left: 5px solid #c62828; padding: 20px 40px;">
+            <li><strong>Mercury (Hg):</strong> High concentrations in large predatory fish like Tuna and Swordfish.</li>
+            <li><strong>Cadmium (Cd):</strong> Often found in leafy greens and grains grown in phosphate-fertilized soils.</li>
+            <li><strong>Arsenic (As):</strong> A major concern in rice cultivation due to groundwater irrigation patterns.</li>
+        </ul>
+
+        <h2>4. Our Compliance Standards</h2>
+        <p>We strictly adhere to the <strong>Codex Alimentarius</strong> (International Food Standards) and regional FDA/FSSAI mandates to provide legally defensible safety reports for producers and consumers alike.</p>
+    <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="food.jpeg"
+                                alt="7" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-rad" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #4a148c 0%, #311b92 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Radiological Safety & Shielding</h1>
+        <p>Monitoring ionizing and non-ionizing radiation for human health and hardware integrity.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Invisible Spectrum:</strong> Radiation is energy traveling through space. While some forms are harmless, others can strip electrons from atoms (ionizing radiation), leading to cellular damage and genetic mutations.</p>
+
+        <h2>1. Radon Gas: The Soil-Borne Risk</h2>
+        <p>Radon is a colorless, odorless radioactive gas produced by the natural decay of uranium in soil and rocks. It is the leading cause of lung cancer among non-smokers.</p>
+        
+        
+        
+        <p>Because Radon is heavier than air, it accumulates in basements and crawl spaces through foundation cracks. We use <strong>Alpha Track Detectors</strong> to monitor long-term exposure levels. The safety threshold is strictly <strong>4 pCi/L</strong>; levels exceeding this require active sub-slab suction mitigation.</p>
+
+        <h2>2. Ionizing vs. Non-Ionizing Radiation</h2>
+        <p>Our lab distinguishes between high-energy particles and electromagnetic fields (EMF) to provide a full-spectrum safety audit.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; background: #f3e5f5;">
+            <thead>
+                <tr style="background-color: #7b1fa2; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #6a1b9a;">Type</th>
+                    <th style="padding: 12px; border: 1px solid #6a1b9a;">Source</th>
+                    <th style="padding: 12px; border: 1px solid #6a1b9a;">Risk & Monitoring</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;"><strong>Alpha/Beta Particles</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Soil, Industrial isotopes</td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Internal tissue damage; Geiger counters</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;"><strong>Gamma Rays</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Medical X-rays, Cosmic rays</td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Deep tissue penetration; Scintillation detectors</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;"><strong>EMF / Radio</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Cell towers, Power lines</td>
+                    <td style="padding: 12px; border: 1px solid #d1c4e9;">Thermal effects; Broadband field meters</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Shielding Principles (ALARA)</h2>
+        <p>We follow the <strong>ALARA</strong> principle: <em>As Low As Reasonably Achievable</em>. Safety is managed through three primary variables:</p>
+        
+        
+        
+        <ul>
+            <li><strong>Time:</strong> Reducing the duration of exposure.</li>
+            <li><strong>Distance:</strong> Doubling the distance from a source reduces exposure by a factor of four (Inverse Square Law).</li>
+            <li><strong>Shielding:</strong> Utilizing Lead (for Gamma), Plastic/Acrylic (for Beta), or Concrete to absorb energy.</li>
+        </ul>
+
+        <h2>4. Environmental Isotope Analysis</h2>
+        <p>Veritas EnviroLabs uses <strong>Gamma Spectroscopy</strong> to identify specific isotopes in water or food samples, ensuring that fallout or industrial leaks are detected before they enter the local ecosystem.</p>
+    <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="radiolgical.jpeg"
+                                alt="8" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+<div id="page-clim" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #00695c 0%, #004d40 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Climate Intelligence & Strategy</h1>
+        <p>Beyond compliance: Decarbonizing operations for a resilient future.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Climate Mandate:</strong> Climate change is no longer a distant projection—it is a current operational reality. We help organizations transition from being part of the problem to becoming leaders in the low-carbon economy.</p>
+
+        <h2>1. Carbon Footprint Auditing (GHG Protocol)</h2>
+        <p>To reduce what we emit, we must first measure it with scientific precision. We categorize emissions into three distinct "Scopes" to identify exactly where carbon leakages occur in your business model.</p>
+        
+        
+        
+        <div style="background: #e0f2f1; padding: 25px; border-radius: 12px; margin: 20px 0;">
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 15px;"><strong>🟢 Scope 1: Direct Emissions</strong> <br> <small>Emissions from sources you own or control directly (e.g., company vehicles, onsite boilers).</small></li>
+                <li style="margin-bottom: 15px;"><strong>🔵 Scope 2: Energy Indirect</strong> <br> <small>Emissions from the generation of purchased electricity, steam, or cooling used in your facilities.</small></li>
+                <li style="margin-bottom: 15px;"><strong>🟠 Scope 3: The Value Chain</strong> <br> <small>The most complex category—emissions from suppliers, product use, and waste disposal. This often represents 70-90% of a company's total footprint.</small></li>
+            </ul>
+        </div>
+
+        <h2>2. Risk Modeling & Physical Resilience</h2>
+        <p>Climate strategy isn't just about emissions; it's about survival. We use <strong>Predictive Analytics</strong> to model how changing weather patterns will affect your specific geography.</p>
+        
+        
+
+        <ul>
+            <li><strong>Acute Risks:</strong> Modeling the impact of extreme weather events (floods, wildfires) on infrastructure.</li>
+            <li><strong>Transition Risks:</strong> Preparing for the economic shift as carbon taxes and "Green Mandates" become legal requirements.</li>
+        </ul>
+
+        <h2>3. The Human Element: Mitigation Strategies</h2>
+        <p>We believe technology is only half the battle. True climate strategy requires a shift in human behavior and organizational culture.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0;">
+            <thead>
+                <tr style="background-color: #00796b; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #004d40;">Strategy</th>
+                    <th style="padding: 12px; border: 1px solid #004d40;">The "Human" Impact</th>
+                    <th style="padding: 12px; border: 1px solid #004d40;">Goal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;"><strong>Energy Efficiency</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Reducing waste through smart habits and IoT.</td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Lower Scopes 1 & 2</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;"><strong>Circular Economy</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Designing out waste; repairing vs. replacing.</td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Zero-Waste Goal</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;"><strong>Regenerative Sourcing</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Partnering with suppliers who restore ecosystems.</td>
+                    <td style="padding: 12px; border: 1px solid #b2dfdb;">Net-Positive Impact</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Carbon Sequestration & Offsetting</h2>
+        <p>For emissions that cannot be eliminated yet, we identify high-quality <strong>Nature-Based Solutions</strong> (like reforestation) and <strong>Direct Air Capture (DAC)</strong> technologies to balance the atmospheric scales.</p>
+    <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="climate.jpeg"
+                                alt="9" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+<div id="page-smart" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #0277bd 0%, #01579b 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Smart City IoT & Digital Twins</h1>
+        <p>Deploying the urban nervous system for real-time environmental responsiveness.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Living City:</strong> A Smart City isn't just about automation; it's about awareness. By embedding intelligence into the physical world, we transform static infrastructure into a dynamic, responsive ecosystem that protects its citizens.</p>
+
+        <h2>1. Distributed Sensor Architecture</h2>
+        <p>We utilize <strong>LPWAN (Low-Power Wide-Area Network)</strong> technology to connect thousands of low-cost, high-precision sensors across the urban landscape. These nodes operate in a <strong>Mesh Network</strong>, ensuring that if one node fails, the data path automatically reroutes.</p>
+        
+        
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0;">
+            <div style="background: #e1f5fe; padding: 20px; border-radius: 8px; border-top: 4px solid #0288d1;">
+                <strong>📡 Air Quality Nodes</strong>
+                <p style="font-size: 0.9rem;">Real-time PM2.5 and NO<sub>2</sub> heatmaps to divert traffic from high-pollution zones.</p>
+            </div>
+            <div style="background: #e1f5fe; padding: 20px; border-radius: 8px; border-top: 4px solid #0288d1;">
+                <strong>💧 Smart Water Grids</strong>
+                <p style="font-size: 0.9rem;">Acoustic leak detection and real-time pH monitoring in municipal reservoirs.</p>
+        
+            </div>
+        </div>
+
+        <h2>2. AI-Driven Predictive Analytics</h2>
+        <p>Data is useless without insight. Our AI engine processes billions of data points to create a <strong>Digital Twin</strong> of the city, allowing us to simulate environmental scenarios before they happen.</p>
+        
+        
+
+        <ul>
+            <li><strong>Smog Forecasting:</strong> Combining wind patterns, humidity, and traffic data to predict smog events 48 hours in advance.</li>
+            <li><strong>Acoustic Event Detection:</strong> Identifying industrial noise spikes or structural vibrations in heritage buildings in real-time.</li>
+            <li><strong>Urban Heat Island Mitigation:</strong> Using thermal sensors to trigger automated irrigation and "green cooling" systems.</li>
+        </ul>
+
+        <h2>3. Data Sovereignty & Citizen Access</h2>
+        <p>We believe environmental data belongs to the people. Our IoT framework includes an open-access API for developers and a <strong>Citizen Dashboard</strong> for real-time local updates.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0;">
+            <thead>
+                <tr style="background-color: #01579b; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #01437a;">Component</th>
+                    <th style="padding: 12px; border: 1px solid #01437a;">Technology</th>
+                    <th style="padding: 12px; border: 1px solid #01437a;">Benefit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;"><strong>Connectivity</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">LoRaWAN / 5G</td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">Massive device density</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;"><strong>Processing</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">Edge Computing</td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">Ultra-low latency response</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;"><strong>Storage</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">Blockchain Ledger</td>
+                    <td style="padding: 12px; border: 1px solid #b3e5fc;">Immutable environmental records</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Future-Proofing Urban Spaces</h2>
+        <p>Veritas IoT solutions are designed to be modular. As new threats emerge—from microplastics to novel pathogens—our sensor architecture can be updated over-the-air (OTA) to keep the city safe and informed.</p>
+    <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="smart city.jpeg"
+                                alt="10" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-waste" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #558b2f 0%, #33691e 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Waste Management & Resource Recovery</h1>
+        <p>Transforming urban refuse into sustainable energy and circular materials.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The End of "Away":</strong> When we throw something away, there is no magical "away." Every piece of refuse must go somewhere. Our goal is to shift communities from a linear "Take-Make-Dispose" model to a closed-loop system where today's waste becomes tomorrow's raw material.</p>
+
+        <h2>1. The Anatomy of an Engineered Landfill</h2>
+        <p>Modern landfills are not simply "dumps." They are highly complex, strictly regulated biochemical reactors designed to isolate toxins from the surrounding environment and protect local groundwater.</p>
+        
+        
+
+        <div style="background: #f1f8e9; border-left: 5px solid #558b2f; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Leachate Collection:</strong> As rainwater filters through rotting trash, it creates a toxic "garbage tea" called leachate. We use HDPE (plastic) liners and drainage pipes to capture and treat this before it reaches aquifers.</li>
+                <li><strong>Landfill Gas (LFG) Extraction:</strong> Anaerobic bacteria break down organic waste, producing a mix of Methane (CH<sub>4</sub>) and Carbon Dioxide (CO<sub>2</sub>). We capture this gas and burn it in generators to power nearby homes.</li>
+            </ul>
+        </div>
+
+        <h2>2. Waste Characterization & "Sort Studies"</h2>
+        <p>You cannot manage what you don't measure. We conduct rigorous physical sorting of municipal solid waste (MSW) to determine its composition, allowing cities to optimize their recycling and recovery programs.</p>
+
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #33691e; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #1b5e20;">Waste Stream</th>
+                    <th style="padding: 12px; border: 1px solid #1b5e20;">Processing Method</th>
+                    <th style="padding: 12px; border: 1px solid #1b5e20;">Value Recovered</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;"><strong>🍏 Wet Organics (Food/Yard)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Anaerobic Digestion / Composting</td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Biogas, Nutrient-rich fertilizer</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;"><strong>📦 Dry Recyclables (Paper/PET)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Material Recovery Facility (MRF)</td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Post-Consumer Resin (PCR), Pulp</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;"><strong>🔥 Combustible Rejects</strong></td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Refuse Derived Fuel (RDF)</td>
+                    <td style="padding: 12px; border: 1px solid #dcedc8;">Thermal energy for cement kilns</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. The Circular Economy Paradigm</h2>
+        <p>Recycling is good, but <strong>Circular Design</strong> is better. True waste management begins at the manufacturing stage. We audit supply chains to ensure products are designed for disassembly, repairability, and infinite recycling loops.</p>
+        <h2>4. Electronic & Hazardous Waste (E-Waste)</h2>
+        <p>The fastest-growing waste stream globally. A single lithium-ion battery improperly disposed of can spark catastrophic landfill fires, and heavy metals (lead, cadmium) from old circuit boards can cause severe neurological damage if they enter the water supply. We mandate specialized hydrometallurgical recycling to safely extract rare earth elements from dead electronics.</p>
+     <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="waste module.jpeg"
+                                alt="12" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+<div id="page-mar" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #0097a7 0%, #006064 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Marine Ecosystems & Blue Health</h1>
+        <p>Monitoring the planetary lungs: Acidification, plastics, and water chemistry.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Blue Heart of the Planet:</strong> The ocean covers 70% of the Earth, regulates our climate, and provides the primary protein source for over 3 billion people. Yet, it operates as the ultimate sink for human pollution. Our lab tracks these invisible changes before they collapse critical aquatic food webs.</p>
+
+        <h2>1. Ocean Acidification: The "Other" CO₂ Problem</h2>
+        <p>While most focus on CO₂ trapping heat in the atmosphere, about 30% of global carbon emissions are absorbed directly by the ocean. This fundamentally alters marine chemistry by creating <strong>Carbonic Acid</strong>, lowering the water's pH.</p>
+        
+        
+
+        <div style="background: #e0f7fa; padding: 20px; border-left: 5px solid #0097a7; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin-top: 0;"><strong>The Calcification Crisis:</strong> Lower pH depletes carbonate ions—the exact building blocks marine life needs to survive. Organisms like oysters, clams, sea urchins, and the foundational coral reefs are literally dissolving faster than they can grow their shells.</p>
+        </div>
+
+        <h2>2. Microplastics & Nanoplastics</h2>
+        <p>Plastic never truly breaks down; it only breaks <em>apart</em>. Microplastics (less than 5mm) are now found in the deepest ocean trenches and inside human bloodstreams. They act as microscopic sponges, absorbing other toxic chemicals from the water.</p>
+
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #00838f; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #006064;">Polymer Type</th>
+                    <th style="padding: 12px; border: 1px solid #006064;">Common Source</th>
+                    <th style="padding: 12px; border: 1px solid #006064;">Lab Detection Method</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;"><strong>Microfibers (Polyester/Nylon)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Synthetic clothing washed in domestic washing machines.</td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Tissue Digestion + FTIR Spectroscopy</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;"><strong>Polyethylene (PE)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Degraded single-use grocery bags and packaging.</td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Raman Spectroscopy</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;"><strong>Nylon-6 (Ghost Nets)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Abandoned commercial fishing gear.</td>
+                    <td style="padding: 12px; border: 1px solid #b2ebf2;">Visual sorting + Chemical Assay</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Eutrophication & Hypoxic "Dead Zones"</h2>
+        <p>What happens on land doesn't stay on land. When excess nitrogen and phosphorus from agricultural fertilizer wash into rivers and eventually the sea, they trigger massive, unnatural explosions of algae.</p>
+
+        
+
+        <ul>
+            <li><strong>The Algal Bloom:</strong> Sunlight is blocked, killing deep-water plants.</li>
+            <li><strong>Oxygen Depletion:</strong> When the massive algal bloom dies, bacteria consume it. These bacteria use up nearly all the dissolved oxygen in the water.</li>
+            <li><strong>The Dead Zone:</strong> The water becomes hypoxic (lacking oxygen). Any marine life that cannot swim away fast enough suffocates. We use continuous dissolved oxygen (DO) sensors to map these expanding hazard zones.</li>
+        </ul>
+     <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="marine .jpeg"
+                                alt="13" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-tox" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Toxicology & Health Risk</h1>
+        <p>Quantifying chemical hazards to protect human health and ecological integrity.</p>
+    </div>
+    
+    <div class="article-content">
+        <div style="background: #f3e5f5; padding: 20px; border-left: 5px solid #6a1b9a; margin-bottom: 25px; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; font-style: italic;">"All things are poison, and nothing is without poison; the dosage alone makes it so a thing is not a poison." — Paracelsus (1538)</p>
+        </div>
+        
+        <p><strong>The Science of Safety:</strong> Toxicology is not just about finding poisons; it is about establishing boundaries. Every chemical, from arsenic to drinking water, has a threshold where it becomes harmful. Our lab determines these exact limits to ensure the air you breathe and the products you use are safe.</p>
+
+        <h2>1. The Exposure Paradigm: Acute vs. Chronic</h2>
+        <p>Toxicity is measured across two entirely different timelines. A chemical that is harmless in a single dose might be deadly if exposed to it every day for a decade.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0;">
+            <div style="background: #fafafa; padding: 20px; border-radius: 8px; border-top: 4px solid #d32f2f; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3 style="color: #d32f2f; margin-top: 0;">⚠️ Acute Toxicity</h3>
+                <p style="font-size: 0.95rem;"><strong>The Scenario:</strong> A single, high-dose exposure (e.g., an industrial chemical spill or inhaling toxic fumes during a fire).</p>
+                <p style="font-size: 0.95rem;"><strong>The Metric (LD₅₀):</strong> The "Lethal Dose 50%". This is the statistically derived dose at which a chemical is expected to be fatal to 50% of a test population. It helps us classify immediate chemical hazards.</p>
+            </div>
+            <div style="background: #fafafa; padding: 20px; border-radius: 8px; border-top: 4px solid #f57c00; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3 style="color: #f57c00; margin-top: 0;">⏳ Chronic Toxicity</h3>
+                <p style="font-size: 0.95rem;"><strong>The Scenario:</strong> Continuous, low-level exposure over months or years (e.g., breathing daily urban smog or drinking trace amounts of lead).</p>
+                <p style="font-size: 0.95rem;"><strong>The Metric:</strong> We look for systemic effects like carcinogenesis (cancer), mutagenesis (DNA damage), or endocrine disruption (hormone interference).</p>
+            </div>
+        </div>
+
+        <h2>2. Accumulation & Magnification</h2>
+        <p>Chemicals behave differently once they enter a living organism. Understanding how they build up is critical for setting food and water safety standards.</p>
+        
+        
+
+        <ul>
+            <li><strong>Bioaccumulation:</strong> Occurs within a <em>single organism</em>. If a fish takes in a toxin (like mercury) faster than its liver can process and excrete it, the toxin builds up in its tissues over its lifetime.</li>
+            <li><strong>Biomagnification:</strong> Occurs across the <em>entire food chain</em>. An algae absorbs a tiny bit of toxin. A small fish eats 1,000 algae. A tuna eats 1,000 small fish. By the time a human eats the tuna, the toxin concentration has multiplied millions of times.</li>
+        </ul>
+
+        <h2>3. Ecotoxicology: The 96-Hour Fish Bioassay</h2>
+        <p>Before an industrial plant is legally allowed to discharge treated wastewater (effluent) into a river, it must pass a biological reality check. Chemical tests alone cannot predict how mixed toxins interact.</p>
+        
+        <p>We perform <strong>WET (Whole Effluent Toxicity) testing</strong> using indicator species like Zebrafish or Fathead Minnows. By observing their survival, growth, and reproduction rates in various concentrations of the effluent over 96 hours, we can definitively prove whether the water is safe to return to nature.</p>
+
+        <h2>4. Human Health Risk Assessment (HHRA)</h2>
+        <p>How do we turn lab data into public safety laws? We use a structured, four-step scientific framework to advise governments and corporations:</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0;">
+            <thead>
+                <tr style="background-color: #4a148c; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #380b6e;">Step</th>
+                    <th style="padding: 12px; border: 1px solid #380b6e;">Process</th>
+                    <th style="padding: 12px; border: 1px solid #380b6e;">The Question Answered</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><strong>1. Hazard ID</strong></td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;">Reviewing chemical properties</td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><em>Can this chemical harm humans?</em></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><strong>2. Dose-Response</strong></td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;">Finding the "No Effect Level" (NOAEL)</td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><em>At what exact dose does the harm begin?</em></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><strong>3. Exposure Assessment</strong></td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;">Analyzing community contact routes</td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><em>How much are people actually inhaling or eating?</em></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><strong>4. Risk Characterization</strong></td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;">Combining all data into a safety threshold</td>
+                    <td style="padding: 12px; border: 1px solid #e1bee7;"><em>Is the current community risk acceptable?</em></td>
+                </tr>
+            </tbody>
+        </table>
+     <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="toxicology.jpeg"
+                                alt="14" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-legal" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #3e2723 0%, #5d4037 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Environmental Law & Liability</h1>
+        <p>Translating scientific data into legal accountability and corporate compliance.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>Science Meets Accountability:</strong> Environmental law is the mechanism by which society protects its shared resources. Our laboratory provides the rigorous, defensible data required by courts, regulatory agencies, and corporations to determine liability and enforce compliance.</p>
+
+        <h2>1. The "Polluter Pays" Principle</h2>
+        <p>This is the foundational pillar of international environmental law. It dictates that the entity responsible for producing pollution must bear the financial burden of cleaning it up, rather than passing the cost onto the taxpayer or local community.</p>
+
+        <div style="background: #efebe9; padding: 20px; border-left: 5px solid #5d4037; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin-top: 0;"><strong>Legal Defensibility:</strong> In a court of law, data is constantly challenged. Veritas EnviroLabs maintains strict <strong>Chain of Custody (CoC)</strong> protocols for all samples. From the moment a water sample is drawn to the moment it is analyzed in the spectrometer, its location, handler, and temperature are legally documented.</p>
+        </div>
+
+        <h2>2. Environmental Impact Assessments (EIA)</h2>
+        <p>Before a shovel ever hits the ground for a new factory, highway, or mine, a massive legal and scientific document must be approved. The EIA is designed to predict environmental consequences before they happen.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #4e342e; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #3e2723;">EIA Phase</th>
+                    <th style="padding: 12px; border: 1px solid #3e2723;">Our Lab's Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;"><strong>1. Baseline Study</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;">Documenting the <em>current</em> state of the air, water, and soil before any construction begins.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;"><strong>2. Impact Prediction</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;">Using modeling software to predict how the project will alter local noise levels, water tables, or air quality.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;"><strong>3. Mitigation Plan</strong></td>
+                    <td style="padding: 12px; border: 1px solid #d7ccc8;">Designing engineering solutions (like noise barriers or effluent treatment plants) to neutralize the predicted impacts.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Environmental Forensics: Isotopic Fingerprinting</h2>
+        <p>When an illegal chemical dump or an offshore oil spill occurs, perpetrators often deny involvement. Environmental forensics allows us to act as ecological crime scene investigators.</p>
+
+        [Image of isotopic fingerprinting matching an oil spill sample to a specific cargo ship]
+
+        <ul>
+            <li><strong>Chemical Fingerprinting:</strong> Every batch of crude oil or industrial chemical has a unique ratio of stable isotopes (like Carbon-12 vs. Carbon-13). </li>
+            <li><strong>The Match:</strong> By analyzing a sample from an oil slick on a beach, we can match its specific "fingerprint" directly to the fuel tanks of a specific ship passing through the area, proving liability beyond a reasonable doubt.</li>
+        </ul>
+
+        <h2>4. Navigating Global Treaties</h2>
+        <p>We help multinational corporations ensure their supply chains do not violate international agreements, such as:</p>
+        <ul>
+            <li><strong>The Basel Convention:</strong> Preventing the illegal export of hazardous E-Waste to developing nations.</li>
+            <li><strong>The Minamata Convention:</strong> Ensuring total phase-outs of mercury usage in industrial processes.</li>
+            <li><strong>The Montreal Protocol:</strong> Auditing HVAC and refrigeration systems to ensure zero leakage of ozone-depleting substances (CFCs and HCFCs).</li>
+        </ul>
+         <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="law module.jpeg"
+                                alt="15" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+<div id="page-csr" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>CSR, ESG & Corporate Integrity</h1>
+        <p>Moving beyond promises: Verifying corporate impact through hard science.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>The Era of Accountability:</strong> Modern consumers, employees, and investors no longer accept vague promises of "going green." True Corporate Social Responsibility (CSR) and Environmental, Social, and Governance (ESG) mandates require empirical proof. Our lab provides the scientific backbone to your sustainability claims.</p>
+
+        <h2>1. Combating "Greenwashing"</h2>
+        <p>Greenwashing occurs when a company spends more time and money marketing itself as environmentally friendly than actually minimizing its environmental impact. We act as the independent, third-party auditor to verify your brand's claims.</p>
+
+        <div style="background: #e8f5e9; padding: 20px; border-left: 5px solid #2e7d32; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin-top: 0;"><strong>The Verification Process:</strong> If your product claims to be "100% Biodegradable," "Zero Waste," or "Free of Toxins," our lab tests it against global ASTM and ISO standards. We don't just read the label; we analyze the molecular reality, giving your brand unshakeable scientific credibility.</p>
+        </div>
+
+        <h2>2. Life Cycle Assessment (LCA)</h2>
+        <p>To understand the true environmental cost of a product, you must look far beyond the factory floor. We conduct comprehensive LCAs to track environmental impacts from <strong>"Cradle to Grave"</strong>—and increasingly, <strong>"Cradle to Cradle"</strong> (circular recycling).</p>
+
+        
+
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #2e7d32; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #1b5e20;">LCA Phase</th>
+                    <th style="padding: 12px; border: 1px solid #1b5e20;">What We Measure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;"><strong>1. Extraction (Cradle)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;">Ecological damage, water usage, and energy required to mine, harvest, or synthesize raw materials.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;"><strong>2. Manufacturing</strong></td>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;">Chemical runoff, effluent toxicity, and the carbon emissions (Scope 1 & 2) generated on the factory floor.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;"><strong>3. Use Phase</strong></td>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;">The energy the product consumes or the microplastics it sheds while owned by the consumer.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;"><strong>4. Disposal (Grave)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #c8e6c9;">Landfill methane generation, incineration toxic release, or recyclability potential.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. ESG Reporting & Compliance</h2>
+        <p>Sustainability reports are transitioning from voluntary PR documents to legally mandated financial disclosures. We help translate your operational data into recognized global reporting frameworks:</p>
+        
+        <ul>
+            <li><strong>GRI (Global Reporting Initiative):</strong> Ensuring your environmental metrics are transparent, standardized, and globally comparable.</li>
+            <li><strong>Science Based Targets (SBTi):</strong> We help you set carbon reduction goals that actually align with the Paris Agreement's 1.5°C pathway, moving beyond arbitrary corporate goals to math-backed environmental science.</li>
+        </ul>
+         <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="csr.jpeg"
+                                alt="14" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-rem" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>DIY Mitigation & Everyday Science</h1>
+        <p>Practical, science-backed strategies to protect your immediate home environment.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>Your First Line of Defense:</strong> Environmental intelligence isn't just for multinational corporations and smart cities. According to the EPA, indoor environments can be up to five times more polluted than the outdoors. Here is how you can apply laboratory-grade science using everyday household items.</p>
+
+        <h2>1. Off-Grid Water Purification</h2>
+        <p>Whether facing a natural disaster or traveling, understanding the physics and biology of water purification is a critical survival skill.</p>
+        
+        
+
+        <div style="background: #fff8e1; border-left: 5px solid #ff6f00; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Thermal Disinfection (Boiling):</strong> Bringing water to a rolling boil for 1 to 3 minutes physically denatures the proteins of bacteria, viruses, and protozoa, rendering them harmless. <em>Note: Boiling does not remove chemical toxins or heavy metals.</em></li>
+                <li><strong>SODIS (Solar Water Disinfection):</strong> A WHO-approved method for developing areas. By placing clear PET plastic bottles of water in direct sunlight for 6 hours, the combination of thermal heating and UV-A radiation permanently destroys the DNA of aquatic pathogens.</li>
+            </ul>
+        </div>
+
+        <h2>2. Botanical Biofiltration & Indoor Air</h2>
+        <p>Modern homes are tightly sealed for energy efficiency, which traps Volatile Organic Compounds (VOCs) off-gassing from paint, furniture, and cleaning supplies. We can combat this using natural biofilters.</p>
+        
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #ff8f00; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #ff6f00;">Bio-Filter</th>
+                    <th style="padding: 12px; border: 1px solid #ff6f00;">Scientific Mechanism</th>
+                    <th style="padding: 12px; border: 1px solid #ff6f00;">Best Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ffe082;"><strong>🐍 Snake Plant</strong><br><small>(Sansevieria)</small></td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Utilizes CAM (Crassulacean Acid Metabolism) to absorb CO₂ and release oxygen specifically at night.</td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Bedrooms (for nighttime oxygenation).</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ffe082;"><strong>🕷️ Spider Plant</strong><br><small>(Chlorophytum)</small></td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Highly effective at phytoremediation—absorbing Formaldehyde and Xylene through its leaves.</td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Living rooms or near newly assembled furniture.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ffe082;"><strong>⚫ Activated Carbon</strong><br><small>(Charcoal)</small></td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Millions of microscopic pores trap gas molecules via <em>adsorption</em> (chemical binding to the surface).</td>
+                    <td style="padding: 12px; border: 1px solid #ffe082;">Near trash cans, litter boxes, or damp areas.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Green Household Chemistry</h2>
+        <p>Many commercial cleaning products contain harsh synthetic chemicals that trigger asthma and degrade indoor air quality. You can replace them by understanding basic acid-base chemistry.</p>
+
+
+        <ul>
+            <li><strong>White Vinegar (Acetic Acid - pH ~2.5):</strong> The mild acidity dissolves mineral deposits (hard water stains) and is inherently antimicrobial, making it an excellent glass and surface cleaner.</li>
+            <li><strong>Baking Soda (Sodium Bicarbonate - pH ~8.3):</strong> A mild alkaline compound that acts as a gentle abrasive. It neutralizes acidic odor molecules, turning them into odorless salts.</li>
+            <li><strong>Hydrogen Peroxide (H₂O₂):</strong> An eco-friendly alternative to chlorine bleach. It kills bacteria through oxidation (destroying cell walls) and safely breaks down into plain water and oxygen.</li>
+        </ul>
+         <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="everyday.jpeg"
+                                alt="16"
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-equip" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Advanced Analytical Equipment</h1>
+        <p>The arsenal of truth: Demystifying the machines that quantify our environment.</p>
+    </div>
+    
+    <div class="article-content">
+        <p><strong>We Don't Guess; We Quantify:</strong> In environmental science, you cannot manage what you cannot measure. Our laboratory relies on a suite of state-of-the-art analytical instruments designed to find needles in planetary-sized haystacks. Here is a look inside our testing facility.</p>
+
+        <h2>1. GC-MS (Gas Chromatography-Mass Spectrometry)</h2>
+        <p>The GC-MS is the gold standard for identifying volatile organic compounds (VOCs) in air and soil. It works in two distinct steps: a "Molecular Sieve" and a "Shatter Scale."</p>
+        
+        [Image of gas chromatography mass spectrometry diagram showing separation and detection]
+
+        <div style="background: #eceff1; border-left: 5px solid #607d8b; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>The Separation (Gas Chromatography):</strong> The sample is vaporized and pushed through a microscopic, coiled tube (often 30 meters long). Smaller, lighter molecules race through quickly, while heavier ones get "stuck" and take longer, separating the mixture into individual ingredients.</li>
+                <li><strong>The Identification (Mass Spectrometry):</strong> As each ingredient exits the tube, an electron beam shatters it into charged fragments. The machine weighs these fragments, creating a unique "molecular fingerprint" that we match against a library of hundreds of thousands of known toxins.</li>
+            </ul>
+        </div>
+
+        <h2>2. ICP-MS (Inductively Coupled Plasma)</h2>
+        <p>When we need to find heavy metals like Lead, Arsenic, or Mercury in drinking water, we turn to the ICP-MS. This machine utilizes extreme, almost unfathomable physics to achieve unmatched sensitivity.</p>
+
+        <ul>
+            <li><strong>The Plasma Torch:</strong> It uses argon gas suspended in an electromagnetic field to create plasma that burns at <strong>10,000 Kelvin</strong>—roughly the temperature of the surface of the sun.</li>
+            <li><strong>Total Atomization:</strong> When a water sample is sprayed into this plasma, every chemical bond is instantly obliterated, stripping the sample down to its raw elemental atoms so they can be counted one by one.</li>
+        </ul>
+
+        <table style="width:100%; border-collapse: collapse; margin: 25px 0; box-shadow: var(--shadow);">
+            <thead>
+                <tr style="background-color: #455a64; color: white; text-align: left;">
+                    <th style="padding: 12px; border: 1px solid #37474f;">Measurement Scale</th>
+                    <th style="padding: 12px; border: 1px solid #37474f;">Real-World Equivalent</th>
+                    <th style="padding: 12px; border: 1px solid #37474f;">ICP-MS Capability</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;"><strong>PPM (Parts Per Million)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">One drop of water in a standard 50-liter car gas tank.</td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">Effortless baseline detection.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;"><strong>PPB (Parts Per Billion)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">One drop of water in an Olympic-sized swimming pool.</td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">Standard operational sensitivity.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;"><strong>PPT (Parts Per Trillion)</strong></td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">One drop of water in twenty Olympic-sized swimming pools.</td>
+                    <td style="padding: 12px; border: 1px solid #cfd8dc;">Maximum threshold for highly toxic metals.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. HPLC (High-Performance Liquid Chromatography)</h2>
+        <p>Not everything can be vaporized into a gas for the GC-MS. For heavy, heat-sensitive compounds—like pesticide residues on an apple, pharmaceutical runoff in a river, or complex proteins—we use HPLC.</p>
+        <p>Instead of gas, HPLC uses extremely high pressure (up to 6,000 psi) to force liquid solvents through a densely packed column of silica. This allows us to separate and identify "forever chemicals" (PFAS) and food adulterants without destroying the molecules in the process.</p>
+     <div style="width: 100%; text-align: center; margin-top: 20px;">
+                            <img src="lab equipment.jpeg"
+                                alt="17" 
+                                style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+    </div>
+</div>
+
+<div id="page-cit" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Verified Citizen Reporting</h1>
+        <p>Submit legally actionable environmental intelligence directly to our lab.</p>
+    </div>
+    
+    <div class="article-content">
+        <div style="background: #e3f2fd; padding: 20px; border-left: 5px solid #1976d2; margin-bottom: 30px; border-radius: 0 8px 8px 0;">
+            <h4 style="margin-top: 0; color: #0d47a1;">Verified Reporting Protocol</h4>
+            <p style="margin-bottom: 0; font-size: 0.95rem;">To ensure that your report can be used for official investigations and legal action, anonymous tips are no longer accepted. All submissions require valid identity verification and video evidence. Your personal data is encrypted and handled under strict confidentiality laws.</p>
+        </div>
+        
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 8px; border: 1px solid #ddd; box-shadow: var(--shadow);">
+            <h3 style="margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #b71c1c;">File an Official Incident Report</h3>
+            
+            <form onsubmit="event.preventDefault(); alert('Report submitted securely. Our forensics team will review the evidence.');">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Type of Violation *</label>
+                        <select required style="width:100%; padding:10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="">-- Select Violation Type --</option>
+                            <option>Industrial Air/Stack Pollution</option>
+                            <option>Illegal Chemical Dumping</option>
+                            <option>Unlawful Deforestation</option>
+                            <option>Severe Noise Violations</option>
+                            <option>Untreated Effluent Discharge</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Exact Location / GPS Coordinates *</label>
+                        <input type="text" required placeholder="e.g., 123 River Rd or 40.7128° N, 74.0060° W" style="width:100%; padding:10px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Incident Details *</label>
+                    <textarea required rows="3" placeholder="Briefly describe what you witnessed..." style="width:100%; padding:10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 20px; background: #fff; padding: 15px; border: 1px dashed #999; border-radius: 4px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px; color: #d32f2f;">📹 Video Evidence (Required)</label>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0;">Please upload a clear video of the incident. <strong>You must briefly address the camera</strong> to state the date, time, and nature of the problem before showing the violation.</p>
+                    <input type="file" required accept="video/mp4, video/mov, video/webm" style="width:100%; padding:5px;">
+                </div>
+
+                <div style="margin-bottom: 25px; background: #fff; padding: 15px; border: 1px dashed #999; border-radius: 4px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px; color: #1976d2;">🪪 Identity Verification (Required)</label>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0;">Upload a clear photo or PDF of a Government-issued ID (Passport, Driver's License, or National ID) to authenticate this report.</p>
+                    <input type="file" required accept="image/png, image/jpeg, application/pdf" style="width:100%; padding:5px;">
+                </div>
+
+                <button type="submit" style="background: #d32f2f; color: white; border: none; padding: 15px 20px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.3s;">
+                    Securely Submit Evidence
+                </button>
+                <p style="text-align: center; font-size: 0.8rem; color: #999; margin-top: 10px;">By submitting, you declare under penalty of perjury that the provided evidence is unedited and truthful.</p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="page-cont" class="article-view">
+    <div class="article-header" style="background: linear-gradient(135deg, #102027 0%, #37474f 100%);">
+        <button class="back-btn" onclick="loadView('dashboard')">← Back to Dashboard</button>
+        <h1>Global Sources & Legal Standards</h1>
+        <p>The international frameworks, treaties, and scientific authorities guiding our analytics.</p>
+    </div>
+    
+    <div class="article-content" style="max-width: 1000px;">
+        <p style="font-size: 1.1rem; color: #546e7a; text-align: center; margin-bottom: 40px;">
+            <strong>Veritas EnviroLabs</strong> operates in strict accordance with the following global scientific, legal, and environmental mandates. Transparency and traceability are the foundations of our intelligence.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div style="background: #f1f8e9; border-left: 5px solid #4caf50; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #2e7d32; font-size: 1.1rem;">💨 Air Quality & Smog</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> PM2.5, PM10, NO<sub>2</sub>, O<sub>3</sub></p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> WHO Global Air Quality Guidelines & U.S. EPA (NAAQS)</p>
+            </div>
+
+            <div style="background: #e1f5fe; border-left: 5px solid #039be5; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #0277bd; font-size: 1.1rem;">💧 Water Purification</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Pathogens, TDS, RO/UV Efficacy</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> EPA Safe Drinking Water Act & CDC</p>
+            </div>
+
+            <div style="background: #efebe9; border-left: 5px solid #795548; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #4e342e; font-size: 1.1rem;">🌱 Soil Health</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> NPK Ratios, pH Gatekeeping</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> USDA (NRCS) & FAO</p>
+            </div>
+
+            <div style="background: #ffebee; border-left: 5px solid #f44336; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #c62828; font-size: 1.1rem;">🍎 Food Toxicology</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Pesticide limits, Food Fraud</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> Codex Alimentarius (FAO/WHO) & FDA/FSSAI</p>
+            </div>
+
+            <div style="background: #e0f2f1; border-left: 5px solid #009688; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #00695c; font-size: 1.1rem;">🌍 Climate Strategy</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Scope 1/2/3 Carbon Footprint</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> GHG Protocol & Science Based Targets (SBTi)</p>
+            </div>
+
+            <div style="background: #f9fbe7; border-left: 5px solid #8bc34a; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #558b2f; font-size: 1.1rem;">♻️ Waste & Circularity</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Landfill Leachate, RDF, Composting</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> EU Waste Framework Directive (2008/98/EC)</p>
+            </div>
+
+            <div style="background: #e0f7fa; border-left: 5px solid #00bcd4; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #00838f; font-size: 1.1rem;">🌊 Marine Ecosystems</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Ocean Acidification, Microplastics</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> NOAA & IPCC Ocean Reports</p>
+            </div>
+
+            <div style="background: #eceff1; border-left: 5px solid #607d8b; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #37474f; font-size: 1.1rem;">⚖️ Environmental Law</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Isotopic Forensics, EIA Guidelines</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> Basel Convention, Minamata, Montreal Protocol</p>
+            </div>
+
+            <div style="background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #1b5e20; font-size: 1.1rem;">📊 CSR & ESG Reporting</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Life Cycle Assessment (LCA)</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> GRI Standards & ISO 14040/14044</p>
+            </div>
+
+            <div style="background: #f3e5f5; border-left: 5px solid #9c27b0; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #6a1b9a; font-size: 1.1rem;">🧪 General Toxicology</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> LD50, PFAS, Bioaccumulation</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> OECD Guidelines for Chemical Testing</p>
+            </div>
+
+            <div style="background: #ede7f6; border-left: 5px solid #673ab7; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #4527a0; font-size: 1.1rem;">☢️ Radiological Safety</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> Radon limits, ALARA Shielding</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> Nuclear Regulatory Commission (NRC) & EPA</p>
+            </div>
+
+            <div style="background: #fff8e1; border-left: 5px solid #ffc107; padding: 20px; border-radius: 6px; box-shadow: var(--shadow);">
+                <h3 style="margin-top: 0; color: #ff8f00; font-size: 1.1rem;">🏠 DIY & Indoor Quality</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Metrics:</strong> SODIS, Botanical Biofiltration</p>
+                <p style="font-size: 0.9rem; margin: 0;"><strong>Authority:</strong> WHO (SODIS) & EPA Indoor Air Quality Data</p>
+            </div>
+
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: #263238; color: white; border-radius: 8px; text-align: center;">
+            <h3 style="margin-top: 0; color: #b0bec5;">Laboratory Equipment Compliance</h3>
+            <p style="font-size: 0.95rem; margin-bottom: 0;">All Veritas EnviroLabs hardware (GC-MS, ICP-MS, HPLC) is calibrated and operated in accordance with <strong>ISO/IEC 17025</strong> (General requirements for the competence of testing and calibration laboratories).</p>
+        </div>
+
+    </div>
+</div>
+    <script>
+        window.onload = function() { loadView('dashboard'); };
+
+        function loadView(viewId) {
+            const views = document.querySelectorAll('.container, .article-view');
+            views.forEach(v => {
+                v.classList.remove('active-view');
+                v.style.display = 'none';
+            });
+
+            const target = document.getElementById(viewId);
+            if(target) {
+                target.classList.add('active-view');
+                target.style.display = 'block';
+                document.getElementById('mainScroll').scrollTop = 0;
+            }
+
+            const buttons = document.querySelectorAll('.nav-item button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes("'"+viewId+"'")) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const progressBar = document.getElementById('progressBarContainer');
+            if(viewId.startsWith('page-')) {
+                progressBar.style.display = 'block';
+            } else {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        const mainContent = document.getElementById('mainScroll');
+        mainContent.onscroll = function() {
+            const winScroll = mainContent.scrollTop;
+            const height = mainContent.scrollHeight - mainContent.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("myBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>
